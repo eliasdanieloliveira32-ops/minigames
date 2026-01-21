@@ -1,12 +1,8 @@
-// app.js (versão mais robusta)
-// Substitua todo o app.js atual por este conteúdo.
-// Suporta login case-insensitive, aguarda DOMContentLoaded e mostra mensagens de erro claras.
-
+// app.js - controle de login, navegação e scoreboard (robusto/mobile-friendly)
 (function(){
-  // usuários (chave exibida -> senha)
   const USERS = { "Gaby": "2101", "Elias": "2101" };
+  let currentUser = null;
 
-  // util: encontra usuário (case-insensitive). retorna chave original (ex: "Gaby") ou null
   function findUserKeyInsensitive(inputName){
     if(!inputName) return null;
     const lower = inputName.trim().toLowerCase();
@@ -16,25 +12,119 @@
     return null;
   }
 
-  // helpers storage
   function getScores(){ try{ return JSON.parse(localStorage.getItem("mm_scores_v1")||"{}"); }catch(e){return{};} }
   function saveScores(data){ localStorage.setItem("mm_scores_v1", JSON.stringify(data)); }
-  function ensureUserScore(user){
+  function ensureUserScore(u){
     const data = getScores();
-    if(!data[user]){ data[user] = { memory:0, mole:0, reaction:0, maze:0, collect:0 }; saveScores(data); }
+    if(!data[u]){ data[u] = { memory:0, mole:0, reaction:0, maze:0, collect:0 }; saveScores(data); }
   }
 
-  // DOM ready
   document.addEventListener('DOMContentLoaded', () => {
-    // elements (IDs presentes no index.html)
     const loginScreen = document.getElementById("login-screen");
     const appScreen = document.getElementById("app-screen");
     const loginUserInput = document.getElementById("login-user");
     const loginPassInput = document.getElementById("login-pass");
     const loginBtn = document.getElementById("login-btn");
     const loginError = document.getElementById("login-error");
+    const guestBtn = document.getElementById("guest-btn");
     const userNameEl = document.getElementById("user-name");
     const scoreBoard = document.getElementById("score-board");
+    const gameArea = document.getElementById("game-area");
+
+    if(!loginBtn || !loginUserInput || !loginPassInput){
+      console.warn("app.js: elementos de login não encontrados.");
+      if(loginError) loginError.textContent = "Erro: elementos de login não encontrados.";
+      return;
+    }
+
+    function renderScores(u){
+      const data = (getScores()[u]) || { memory:0, mole:0, reaction:0, maze:0, collect:0 };
+      scoreBoard.innerHTML = `
+        <div style="font-weight:700">🃏 Memória: ${data.memory}</div>
+        <div style="font-weight:700">🐹 Acerta: ${data.mole}</div>
+        <div style="font-weight:700">⚡ Reflexo: ${data.reaction}</div>
+        <div style="font-weight:700">🌀 Labirinto: ${data.maze}</div>
+        <div style="font-weight:700">💖 Coletar: ${data.collect}</div>
+      `;
+    }
+
+    // global addScore para os jogos
+    window.addScore = function(game, value){
+      if(!currentUser) return console.warn("addScore: nenhum usuário logado");
+      const data = getScores();
+      data[currentUser] = data[currentUser] || { memory:0, mole:0, reaction:0, maze:0, collect:0 };
+      data[currentUser][game] = (data[currentUser][game] || 0) + Number(value||0);
+      saveScores(data);
+      renderScores(currentUser);
+    };
+
+    function loadGame(name){
+      gameArea.innerHTML = '';
+      document.querySelectorAll('script[data-game-script]').forEach(s=>s.remove());
+      const s = document.createElement('script');
+      s.src = `${name}.js?ts=${Date.now()}`;
+      s.setAttribute('data-game-script', name);
+      s.onload = () => { if(window.utils && window.utils.playSound) window.utils.playSound('flip'); };
+      s.onerror = () => { gameArea.innerHTML = '<p>Falha ao carregar o jogo.</p>'; };
+      document.body.appendChild(s);
+    }
+
+    // handlers dos botões
+    document.querySelectorAll('[data-game]').forEach(btn=>{
+      btn.addEventListener('click', ()=> loadGame(btn.getAttribute('data-game')));
+    });
+
+    loginBtn.addEventListener('click', ()=>{
+      const rawUser = loginUserInput.value || '';
+      const rawPass = loginPassInput.value || '';
+      loginError.textContent = '';
+
+      const key = findUserKeyInsensitive(rawUser);
+      if(!key){ loginError.textContent = 'Usuário não encontrado'; return; }
+      if(USERS[key] !== rawPass){ loginError.textContent = 'Senha incorreta'; return; }
+
+      currentUser = key;
+      ensureUserScore(currentUser);
+      renderScores(currentUser);
+      if(userNameEl) userNameEl.textContent = currentUser;
+      loginScreen.style.display = 'none';
+      appScreen.style.display = 'flex';
+
+      // tentar pré-carregar sons (utils)
+      if(window.utils && window.utils.preloadSounds) {
+        window.utils.preloadSounds(['flip','match','hit','win','collect']).catch(()=>{});
+      }
+    });
+
+    // botão convidado rápido
+    if(guestBtn){
+      guestBtn.addEventListener('click', ()=>{
+        currentUser = 'Gaby';
+        ensureUserScore(currentUser);
+        renderScores(currentUser);
+        if(userNameEl) userNameEl.textContent = currentUser + " (Convidado)";
+        loginScreen.style.display = 'none';
+        appScreen.style.display = 'flex';
+      });
+    }
+
+    // enter key
+    [loginUserInput, loginPassInput].forEach(inp=>{
+      inp.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') loginBtn.click(); });
+    });
+
+    // registrar SW
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', ()=>{
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registrado:', reg.scope))
+          .catch(err => console.warn('Falha ao registrar SW:', err));
+      });
+    }
+
+    window.mmCurrentUser = ()=> currentUser;
+  });
+})();    const scoreBoard = document.getElementById("score-board");
     const gameArea = document.getElementById("game-area");
 
     if(!loginBtn || !loginUserInput || !loginPassInput){
