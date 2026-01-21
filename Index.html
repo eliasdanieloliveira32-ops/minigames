@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Minigames do Amor</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff6b6b">
+
+  <!-- iOS PWA meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="Minigames do Amor">
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="screen active">
+    <div class="card">
+      <h2>Entrar ❤️</h2>
+      <input id="login-user" placeholder="Usuário" autocomplete="username">
+      <input id="login-pass" type="password" placeholder="Senha" autocomplete="current-password">
+      <button id="login-btn" class="btn">Entrar</button>
+      <p id="login-error" style="color:#ef4444;font-size:14px;text-align:center;margin:0;"></p>
+      <p style="font-size:13px;color:#6b7280;text-align:center;margin-top:8px;">Usuários de teste: Gaby / 2101 • Elias / 2101</p>
+    </div>
+  </div>
+
+  <!-- APP SCREEN -->
+  <div id="app-screen" class="screen" style="display:none;flex-direction:column;min-height:100vh;">
+    <header class="topbar" style="padding:12px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">💖</div>
+        <div>
+          <strong id="user-name">Usuário</strong><br>
+          <small style="color:#6b7280">Minigames do Amor</small>
+        </div>
+      </div>
+      <div>
+        <button id="menu-btn" class="btn-ghost" title="Menu">☰</button>
+      </div>
+    </header>
+
+    <main style="flex:1;display:flex;gap:12px;padding:12px;">
+      <!-- Sidebar -->
+      <aside style="width:220px;min-width:180px;">
+        <div style="background:#fff;border-radius:12px;padding:12px;border:1px solid #e5e7eb;">
+          <h3 style="margin:0 0 8px 0">Pontuação</h3>
+          <div id="score-board" style="color:#374151;font-size:14px">
+            <!-- preenchido por app.js -->
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+
+        <div style="background:#fff;border-radius:12px;padding:12px;border:1px solid #e5e7eb;">
+          <h3 style="margin:0 0 8px 0">Jogos</h3>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button data-game="memory" class="btn-ghost">🃏 Memória</button>
+            <button data-game="mole" class="btn-ghost">🐹 Acerta</button>
+            <button data-game="reaction" class="btn-ghost">⚡ Reflexo</button>
+            <button data-game="maze" class="btn-ghost">🌀 Labirinto</button>
+            <button data-game="collect" class="btn-ghost">💖 Coletar</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Game area -->
+      <section style="flex:1;">
+        <div id="game-area" style="background:#fff;border-radius:12px;padding:14px;border:1px solid #e5e7eb;min-height:360px">
+          <div style="text-align:center;color:#6b7280;padding:36px">
+            <h2>Bem-vindo(a) 💖</h2>
+            <p>Escolha um jogo no menu para começar.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Utils (preload/play sound) e App -->
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
