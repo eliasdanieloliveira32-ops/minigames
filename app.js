@@ -1,16 +1,13 @@
 // app.js - controle de login, navegação, scoreboard e carregamento dos jogos
+// Este arquivo assume que os jogos (memory.js, mole.js, reaction.js, maze.js, collect.js)
+// estão na raiz do repositório (como no seu repo).
 
-const USERS = {
-  "Gaby": "2101",
-  "Elias": "2101"
-};
-
+const USERS = { "Gaby": "2101", "Elias": "2101" };
 let currentUser = null;
 
-// Elementos principais
+// Elementos
 const loginScreen = document.getElementById("login-screen");
 const appScreen = document.getElementById("app-screen");
-
 const loginUserInput = document.getElementById("login-user");
 const loginPassInput = document.getElementById("login-pass");
 const loginBtn = document.getElementById("login-btn");
@@ -21,20 +18,91 @@ const scoreBoard = document.getElementById("score-board");
 const gameArea = document.getElementById("game-area");
 
 // Storage helpers
-function getScores() {
-  try { return JSON.parse(localStorage.getItem("mm_scores_v1") || "{}"); }
-  catch(e){ return {}; }
-}
-function saveScores(data) {
-  localStorage.setItem("mm_scores_v1", JSON.stringify(data));
-}
-function ensureUserScore() {
+function getScores(){ try{ return JSON.parse(localStorage.getItem("mm_scores_v1")||"{}"); }catch(e){return{};} }
+function saveScores(data){ localStorage.setItem("mm_scores_v1", JSON.stringify(data)); }
+function ensureUserScore(){
   const data = getScores();
-  if (!data[currentUser]) {
-    data[currentUser] = { memory:0, mole:0, reaction:0, maze:0, collect:0 };
-    saveScores(data);
-  }
+  if(!data[currentUser]){ data[currentUser] = { memory:0, mole:0, reaction:0, maze:0, collect:0 }; saveScores(data); }
 }
+
+// render scoreboard
+function renderScores(){
+  const data = (getScores()[currentUser]) || { memory:0, mole:0, reaction:0, maze:0, collect:0 };
+  scoreBoard.innerHTML = `
+    <div style="font-weight:700">🃏 Memória: ${data.memory}</div>
+    <div style="font-weight:700">🐹 Acerta: ${data.mole}</div>
+    <div style="font-weight:700">⚡ Reflexo: ${data.reaction}</div>
+    <div style="font-weight:700">🌀 Labirinto: ${data.maze}</div>
+    <div style="font-weight:700">💖 Coletar: ${data.collect}</div>
+  `;
+}
+
+// expõe addScore() global para jogos
+window.addScore = function(game, value){
+  const data = getScores();
+  data[currentUser] = data[currentUser] || { memory:0, mole:0, reaction:0, maze:0, collect:0 };
+  data[currentUser][game] = (data[currentUser][game] || 0) + Number(value||0);
+  saveScores(data);
+  renderScores();
+};
+
+// carrega um jogo (carrega arquivo <name>.js que está na raiz)
+function loadGame(name){
+  gameArea.innerHTML = '';
+  // remove scripts anteriores injetados
+  document.querySelectorAll('script[data-game-script]').forEach(s=>s.remove());
+  const s = document.createElement('script');
+  s.src = `${name}.js?ts=${Date.now()}`;
+  s.setAttribute('data-game-script', name);
+  s.onload = () => { if (window.utils && window.utils.playSound) window.utils.playSound('flip'); };
+  s.onerror = () => { gameArea.innerHTML = '<p>Falha ao carregar o jogo.</p>'; };
+  document.body.appendChild(s);
+}
+
+// handlers dos botões de jogo (eles têm data-game="memory" etc.)
+document.querySelectorAll('[data-game]').forEach(btn=>{
+  btn.addEventListener('click', ()=> loadGame(btn.getAttribute('data-game')));
+});
+
+// login flow
+loginBtn.addEventListener('click', ()=>{
+  const u = loginUserInput.value.trim();
+  const p = loginPassInput.value.trim();
+  loginError.textContent = '';
+  if(!u){ loginError.textContent = 'Digite o usuário'; return; }
+  if(USERS[u] && USERS[u] === p){
+    currentUser = u;
+    ensureUserScore();
+    userNameEl.textContent = currentUser;
+    loginScreen.style.display = 'none';
+    appScreen.style.display = 'flex';
+    renderScores();
+
+    // Preload sounds (se utils disponível)
+    if(window.utils && window.utils.preloadSounds) {
+      window.utils.preloadSounds(['flip','match','hit','win','collect']).catch(()=>{});
+    }
+  } else {
+    loginError.textContent = 'Usuário ou senha incorretos';
+  }
+});
+
+// permitir Enter para logar
+[loginUserInput, loginPassInput].forEach(inp=>{
+  inp.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') loginBtn.click(); });
+});
+
+// registrar service worker (PWA)
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('Service Worker registrado:', reg.scope))
+      .catch(err => console.warn('Falha ao registrar SW:', err));
+  });
+}
+
+// util para debug
+window.mmCurrentUser = ()=> currentUser;}
 
 // render scoreboard
 function renderScores() {
