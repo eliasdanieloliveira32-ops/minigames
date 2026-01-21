@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Minigames do Amor</title>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/styles.css">
+  <!-- CSS (arquivo na raiz: styles.css) -->
+  <link rel="stylesheet" href="styles.css">
 
   <!-- PWA manifest -->
   <link rel="manifest" href="manifest.json">
@@ -15,27 +15,29 @@
   <!-- iOS PWA meta tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.svg">
   <meta name="apple-mobile-web-app-title" content="Minigames do Amor">
 </head>
 <body>
 
   <!-- LOGIN SCREEN -->
-  <div id="login-screen" class="screen active">
-    <div class="card">
-      <h2>Entrar ❤️</h2>
-      <input id="login-user" placeholder="Usuário" autocomplete="username">
-      <input id="login-pass" type="password" placeholder="Senha" autocomplete="current-password">
-      <button id="login-btn" class="btn">Entrar</button>
-      <p id="login-error" style="color:#ef4444;font-size:14px;text-align:center;margin:0;"></p>
-      <p style="font-size:13px;color:#6b7280;text-align:center;margin-top:8px;">Usuários de teste: Gaby / 2101 • Elias / 2101</p>
+  <div id="login-screen" class="screen active" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;">
+    <div class="card" style="max-width:420px;width:100%;">
+      <h2 style="margin:0 0 8px 0">Entrar ❤️</h2>
+      <input id="login-user" placeholder="Usuário" autocomplete="username" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-bottom:8px;">
+      <input id="login-pass" type="password" placeholder="Senha" autocomplete="current-password" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;margin-bottom:8px;">
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button id="login-btn" class="btn" style="padding:10px 14px;border-radius:10px;background:#ff6b6b;color:#fff;border:none;font-weight:700;cursor:pointer">Entrar</button>
+      </div>
+      <p id="login-error" style="color:#ef4444;font-size:14px;text-align:center;margin-top:10px;"></p>
+      <p style="font-size:13px;color:#6b7280;text-align:center;margin-top:8px;margin-bottom:0">Usuários de teste: <strong>Gaby</strong> / 2101 • <strong>Elias</strong> / 2101</p>
     </div>
   </div>
 
   <!-- APP SCREEN -->
   <div id="app-screen" class="screen" style="display:none;flex-direction:column;min-height:100vh;">
-    <header class="topbar" style="padding:12px;display:flex;justify-content:space-between;align-items:center;">
-      <div style="display:flex;gap:10px;align-items:center;">
+    <header style="padding:12px;display:flex;justify-content:space-between;align-items:center;background:transparent;">
+      <div style="display:flex;gap:10px;align-items:center">
         <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#ff6b6b,#6366f1);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">💖</div>
         <div>
           <strong id="user-name">Usuário</strong><br>
@@ -43,13 +45,13 @@
         </div>
       </div>
       <div>
-        <button id="menu-btn" class="btn-ghost" title="Menu">☰</button>
+        <button id="menu-btn" class="btn-ghost" style="padding:8px 10px;border-radius:10px;border:1px solid #e5e7eb;background:transparent;cursor:pointer">☰</button>
       </div>
     </header>
 
     <main style="flex:1;display:flex;gap:12px;padding:12px;">
       <!-- Sidebar -->
-      <aside style="width:220px;min-width:180px;">
+      <aside style="width:220px;min-width:160px;">
         <div style="background:#fff;border-radius:12px;padding:12px;border:1px solid #e5e7eb;">
           <h3 style="margin:0 0 8px 0">Pontuação</h3>
           <div id="score-board" style="color:#374151;font-size:14px">
@@ -62,11 +64,11 @@
         <div style="background:#fff;border-radius:12px;padding:12px;border:1px solid #e5e7eb;">
           <h3 style="margin:0 0 8px 0">Jogos</h3>
           <div style="display:flex;flex-direction:column;gap:8px">
-            <button data-game="memory" class="btn-ghost">🃏 Memória</button>
-            <button data-game="mole" class="btn-ghost">🐹 Acerta</button>
-            <button data-game="reaction" class="btn-ghost">⚡ Reflexo</button>
-            <button data-game="maze" class="btn-ghost">🌀 Labirinto</button>
-            <button data-game="collect" class="btn-ghost">💖 Coletar</button>
+            <button data-game="memory" class="btn-ghost" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer">🃏 Memória</button>
+            <button data-game="mole" class="btn-ghost" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer">🐹 Acerta</button>
+            <button data-game="reaction" class="btn-ghost" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer">⚡ Reflexo</button>
+            <button data-game="maze" class="btn-ghost" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer">🌀 Labirinto</button>
+            <button data-game="collect" class="btn-ghost" style="width:100%;padding:10px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer">💖 Coletar</button>
           </div>
         </div>
       </aside>
@@ -83,9 +85,8 @@
     </main>
   </div>
 
-  <!-- Utils (preload/play sound) e App -->
-  <script src="js/utils.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Utils and App (arquivos na raiz: utils.js e app.js) -->
+  <script src="utils.js"></script>
+  <script src="app.js"></script>
 </body>
-
 </html>
