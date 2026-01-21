@@ -1,40 +1,50 @@
-// app.js - controle de login, navegação e scoreboard (robusto/mobile-friendly)
-(function(){
-  const USERS = { "Gaby": "2101", "Elias": "2101" };
-  let currentUser = null;
+document.addEventListener("DOMContentLoaded", () => {
+  const loginScreen = document.getElementById("login-screen");
+  const appScreen = document.getElementById("app-screen");
 
-  function findUserKeyInsensitive(inputName){
-    if(!inputName) return null;
-    const lower = inputName.trim().toLowerCase();
-    for(const k of Object.keys(USERS)){
-      if(k.toLowerCase() === lower) return k;
-    }
-    return null;
+  const userInput = document.getElementById("login-user");
+  const passInput = document.getElementById("login-pass");
+  const loginBtn = document.getElementById("login-btn");
+  const guestBtn = document.getElementById("guest-btn");
+  const errorBox = document.getElementById("login-error");
+
+  const USERS = {
+    "Gaby": "2101",
+    "Elias": "2101"
+  };
+
+  function enter(username) {
+    localStorage.setItem("user", username);
+    loginScreen.style.display = "none";
+    appScreen.style.display = "flex";
   }
 
-  function getScores(){ try{ return JSON.parse(localStorage.getItem("mm_scores_v1")||"{}"); }catch(e){return{};} }
-  function saveScores(data){ localStorage.setItem("mm_scores_v1", JSON.stringify(data)); }
-  function ensureUserScore(u){
-    const data = getScores();
-    if(!data[u]){ data[u] = { memory:0, mole:0, reaction:0, maze:0, collect:0 }; saveScores(data); }
-  }
+  loginBtn.addEventListener("click", () => {
+    const u = userInput.value.trim();
+    const p = passInput.value.trim();
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const loginScreen = document.getElementById("login-screen");
-    const appScreen = document.getElementById("app-screen");
-    const loginUserInput = document.getElementById("login-user");
-    const loginPassInput = document.getElementById("login-pass");
-    const loginBtn = document.getElementById("login-btn");
-    const loginError = document.getElementById("login-error");
-    const guestBtn = document.getElementById("guest-btn");
-    const userNameEl = document.getElementById("user-name");
-    const scoreBoard = document.getElementById("score-board");
-    const gameArea = document.getElementById("game-area");
-
-    if(!loginBtn || !loginUserInput || !loginPassInput){
-      console.warn("app.js: elementos de login não encontrados.");
-      if(loginError) loginError.textContent = "Erro: elementos de login não encontrados.";
+    if (!u || !p) {
+      errorBox.textContent = "Preencha usuário e senha.";
       return;
+    }
+
+    if (USERS[u] && USERS[u] === p) {
+      enter(u);
+    } else {
+      errorBox.textContent = "Usuário ou senha inválidos.";
+    }
+  });
+
+  guestBtn.addEventListener("click", () => {
+    enter("Convidado");
+  });
+
+  // Auto-login se já tiver usuário salvo
+  const saved = localStorage.getItem("user");
+  if (saved) {
+    enter(saved);
+  }
+});      return;
     }
 
     function renderScores(u){
